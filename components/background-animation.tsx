@@ -11,6 +11,16 @@ export function BackgroundAnimation() {
     const canvas = canvasRef.current
     let app: any = null
 
+    // Check if device is mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   (window.innerWidth <= 768)
+
+    // Don't load animation on mobile devices to prevent performance issues
+    if (isMobile) {
+      console.log('Mobile device detected - skipping background animation for better performance')
+      return
+    }
+
     const loadAnimation = async () => {
       try {
         // Dynamically load Three.js and the tubes cursor
@@ -75,10 +85,27 @@ export function BackgroundAnimation() {
   }, [])
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full"
-      style={{ zIndex: 1 }}
-    />
+    <>
+      {/* Mobile fallback gradient background */}
+      <div 
+        className="absolute inset-0 w-full h-full"
+        style={{
+          zIndex: 1,
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #6958d5 75%, #53bc28 100%)',
+          display: (typeof window !== 'undefined' && window.innerWidth <= 768) ? 'block' : 'none'
+        }}
+      />
+      
+      {/* Desktop tube animation */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full"
+        style={{ 
+          zIndex: 1,
+          // Hide canvas on mobile devices
+          display: (typeof window !== 'undefined' && window.innerWidth <= 768) ? 'none' : 'block'
+        }}
+      />
+    </>
   )
 }
